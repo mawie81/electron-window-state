@@ -1,0 +1,27 @@
+{
+  "name": "electron-window-state",
+  "version": "0.1.0",
+  "description": "Simple module that helps to save and restore size and position of Electron windows.",
+  "license": "MIT",
+  "repository": "mawie81/electron-window-state",
+  "main": "index.js",
+  "author": {
+    "name": "Marcel Wiehle",
+    "email": "mawieh@gmail.com",
+    "url": "marcel.wiehle.me"
+  },
+  "engines": {
+    "node": ">=0.12.0"
+  },
+  "scripts": {
+    "test": "xo"
+  },
+  "keywords": [
+    "electron"
+  ],
+  "author": "Marcel Wiehle",
+  "license": "MIT",
+  "dependencies": {
+    "jsonfile": "^2.2.3"
+  }
+}
