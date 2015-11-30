@@ -5,11 +5,7 @@
   "license": "MIT",
   "repository": "mawie81/electron-window-state",
   "main": "index.js",
-  "author": {
-    "name": "Marcel Wiehle",
-    "email": "mawieh@gmail.com",
-    "url": "marcel.wiehle.me"
-  },
+  "author": "Marcel Wiehle",
   "engines": {
     "node": ">=0.12.0"
   },
@@ -19,9 +15,16 @@
   "keywords": [
     "electron"
   ],
-  "author": "Marcel Wiehle",
-  "license": "MIT",
   "dependencies": {
     "jsonfile": "^2.2.3"
+  },
+  "devDependencies": {
+    "xo": "^0.11.2"
+  },
+  "xo": {
+    "space": true,
+    "rules": {
+      "brace-style": [2, "1tbs", { "allowSingleLine": true }]
+    }
   }
 }
