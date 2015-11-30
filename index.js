@@ -5,16 +5,15 @@ var jsonfile = require('jsonfile');
 var path = require('path');
 
 module.exports = function (name, defaults) {
-  
   var userDataDir = app.getPath('userData');
-  var stateStoreFile = 'window-state-' + name +'.json';
+  var stateStoreFile = 'window-state-' + name + '.json';
   var fullStoreFileName = path.join(userDataDir, stateStoreFile);
 
   var state;
 
   try {
     state = jsonfile.readFileSync(fullStoreFileName);
-  } catch(err) {
+  } catch (err) {
     state = {
       width: defaults.width,
       height: defaults.height
