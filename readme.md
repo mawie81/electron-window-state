@@ -1,4 +1,4 @@
-# electron-window-state
+# electron-window-state [![Build Status](https://travis-ci.org/mawie81/electron-window-state.svg)](https://travis-ci.org/mawie81/electron-window-state)
 
 > A library to store and restore window sizes and positions for your [Electron](http://electron.atom.io) app
 
