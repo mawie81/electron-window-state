@@ -4,6 +4,8 @@
 
 Supports handling of multiple windows.
 
+*Heavily influenced by the implementation in [electron-boilerplate](https://github.com/szwacz/electron-boilerplate).*
+
 ## Install
 
 ```
