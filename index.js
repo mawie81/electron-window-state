@@ -3,11 +3,14 @@
 var app = require('app');
 var jsonfile = require('jsonfile');
 var path = require('path');
+var mkdirp = require('mkdirp');
 
-module.exports = function (name, defaults) {
+module.exports = function (name, defaults, options) {
+  var config = options || {};
   var userDataDir = app.getPath('userData');
-  var stateStoreFile = 'window-state-' + name + '.json';
-  var fullStoreFileName = path.join(userDataDir, stateStoreFile);
+  var stateStoreFile = config.fileName || 'window-state-' + name + '.json';
+  var subFolder = config.folderName || '';
+  var fullStoreFileName = path.join(userDataDir, subFolder, stateStoreFile);
 
   var state;
 
@@ -30,6 +33,7 @@ module.exports = function (name, defaults) {
       state.height = size[1];
     }
     state.isMaximized = win.isMaximized();
+    mkdirp.sync(path.dirname(fullStoreFileName));
     jsonfile.writeFileSync(fullStoreFileName, state);
   };
 
