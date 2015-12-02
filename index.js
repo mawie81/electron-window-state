@@ -5,12 +5,11 @@ var jsonfile = require('jsonfile');
 var path = require('path');
 var mkdirp = require('mkdirp');
 
-module.exports = function (name, defaults, options) {
+module.exports = function (options) {
   var config = options || {};
-  var userDataDir = app.getPath('userData');
-  var stateStoreFile = config.fileName || 'window-state-' + name + '.json';
-  var subFolder = config.folderName || '';
-  var fullStoreFileName = path.join(userDataDir, subFolder, stateStoreFile);
+  var stateStoreFile = config.file || 'window-state.json';
+  var directory = config.path || app.getPath('userData');
+  var fullStoreFileName = path.join(directory, stateStoreFile);
 
   var state;
 
@@ -18,8 +17,8 @@ module.exports = function (name, defaults, options) {
     state = jsonfile.readFileSync(fullStoreFileName);
   } catch (err) {
     state = {
-      width: defaults.width,
-      height: defaults.height
+      width: config.defaultWidth || 800,
+      height: config.defaultHeight || 600
     };
   }
 
