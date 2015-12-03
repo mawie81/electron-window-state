@@ -58,6 +58,39 @@ app.on('ready', function () {
 
   The name of file. Defaults to ```window-state.json```
 
+### state object
+
+```js
+const windowState = windowStateKeeper({
+  defaultWidth: 1000,
+  defaultHeight: 800
+});
+```
+
+`x` - *Number*
+
+  The saved ```x``` coordinate of the loaded state. ```undefined``` if the state has not been saved yet. 
+
+`y` - *Number*
+
+  The saved ```y``` coordinate of the loaded state. ```undefined``` if the state has not been saved yet.
+  
+`width` - *Number*
+
+  The saved ```width``` of loaded state. ```defaultWidth``` if the state has not been saved yet.
+  
+`height` - *Number*
+
+  The saved ```heigth``` of loaded state. ```defaultHeight``` if the state has not been saved yet.
+  
+`isMaximized` - *Boolean*
+
+  ```true``` if the window state was saved while the the window was maximized. ```undefined``` if the state has not been saved yet.
+  
+`saveState(window)` - *Function*
+
+  Saves the current state of the given ```BrowserWindow```.
+
 
 ## License
 
