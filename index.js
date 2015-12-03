@@ -4,12 +4,11 @@ var app = require('app');
 var jsonfile = require('jsonfile');
 var path = require('path');
 var mkdirp = require('mkdirp');
+var objectAssign = require('object-assign');
 
 module.exports = function (options) {
-  var config = options || {};
-  var stateStoreFile = config.file || 'window-state.json';
-  var directory = config.path || app.getPath('userData');
-  var fullStoreFileName = path.join(directory, stateStoreFile);
+  var config = objectAssign({}, {file: 'window-state.json', path: app.getPath('userData')}, options);
+  var fullStoreFileName = path.join(config.path, config.file);
 
   var state;
 
