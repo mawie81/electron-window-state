@@ -14,7 +14,8 @@ module.exports = function (options) {
     path: app.getPath('userData')
   }, options);
   var fullStoreFileName = path.join(config.path, config.file);
-  var delay = 100; // Number of milliseconds to postpone handling the event
+  // Number of milliseconds to postpone handling the event
+  var delay = 100;
   var state;
   var winRef;
 
@@ -42,7 +43,7 @@ module.exports = function (options) {
 
   var isNormal = function (win) {
     return !win.isMaximized() && !win.isMinimized() && !win.isFullScreen();
-  }
+  };
 
   var saveState = function (win) {
     var winBounds = win.getBounds();
@@ -70,7 +71,7 @@ module.exports = function (options) {
         state.height = winBounds.height;
       }
     }, delay);
-  }
+  };
 
   var moveTimer;
   var moveHandler = function () {
@@ -82,25 +83,13 @@ module.exports = function (options) {
         state.y = winBounds.y;
       }
     }, delay);
-  }
+  };
 
   var closeHandler = function () {
     // Note: We wrap saveState because the first parameter of the close event is
     // an event object and not the window object like it expects
     saveState(winRef);
-  }
-
-  var closedHandler = function () {
-    unregister();
-  }
-
-  var register = function (win) {
-    win.on('resize', resizeHandler);
-    win.on('move', moveHandler);
-    win.on('close', closeHandler);
-    win.on('closed', closedHandler);
-    winRef = win;
-  }
+  };
 
   var unregister = function () {
     if (winRef) {
@@ -109,10 +98,18 @@ module.exports = function (options) {
       winRef.removeListener('move', moveHandler);
       clearTimeout(moveTimer);
       winRef.removeListener('close', closeHandler);
-      winRef.removeListener('closed', closedHandler);
+      winRef.removeListener('closed', unregister);
       winRef = null;
     }
-  }
+  };
+
+  var register = function (win) {
+    win.on('resize', resizeHandler);
+    win.on('move', moveHandler);
+    win.on('close', closeHandler);
+    win.on('closed', unregister);
+    winRef = win;
+  };
 
   return {
     get x() { return state.x; },
