@@ -1,20 +1,36 @@
 'use strict';
 
-var app = require('app');
-var jsonfile = require('jsonfile');
-var path = require('path');
-var mkdirp = require('mkdirp');
-var objectAssign = require('object-assign');
+const electron = require('electron');
+const app = electron.app;
+const screen = electron.screen;
+const jsonfile = require('jsonfile');
+const path = require('path');
+const mkdirp = require('mkdirp');
+const objectAssign = require('object-assign');
+const deepEqual = require('deep-equal');
 
 module.exports = function (options) {
-  var config = objectAssign({}, {file: 'window-state.json', path: app.getPath('userData')}, options);
-  var fullStoreFileName = path.join(config.path, config.file);
+  const config = objectAssign({}, {file: 'window-state.json', path: app.getPath('userData')}, options);
+  const fullStoreFileName = path.join(config.path, config.file);
 
-  var state;
+  let state;
 
   try {
     state = jsonfile.readFileSync(fullStoreFileName);
   } catch (err) {
+    // Don't care
+  }
+
+  if (state && state.displayBounds) {
+    // If the display where the app window was displayed is no longer available,
+    // we should drop the stored state
+    const displayBounds = screen.getDisplayMatching(state).bounds;
+    if (!deepEqual(state.displayBounds, displayBounds, {strict: true})) {
+      state = null;
+    }
+  }
+
+  if (!state) {
     state = {
       width: config.defaultWidth || 800,
       height: config.defaultHeight || 600
@@ -22,15 +38,16 @@ module.exports = function (options) {
   }
 
   var saveState = function (win) {
-    if (!win.isMaximized() && !win.isMinimized()) {
-      var position = win.getPosition();
-      var size = win.getSize();
-      state.x = position[0];
-      state.y = position[1];
-      state.width = size[0];
-      state.height = size[1];
+    const winBounds = win.getBounds();
+    const isMaximized = win.isMaximized();
+    if (!isMaximized && !win.isMinimized()) {
+      state.x = winBounds.x;
+      state.y = winBounds.y;
+      state.width = winBounds.width;
+      state.height = winBounds.height;
     }
-    state.isMaximized = win.isMaximized();
+    state.isMaximized = isMaximized;
+    state.displayBounds = screen.getDisplayMatching(winBounds).bounds;
     mkdirp.sync(path.dirname(fullStoreFileName));
     jsonfile.writeFileSync(fullStoreFileName, state);
   };
