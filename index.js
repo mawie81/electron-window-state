@@ -11,8 +11,7 @@ module.exports = function (options) {
   var screen = require('screen');
   var state;
   var winRef;
-  var resizeTimer;
-  var moveTimer;
+  var stateChangeTimer;
   var eventHandlingDelay = 100;
   var config = objectAssign({}, {
     file: 'window-state.json',
@@ -24,18 +23,45 @@ module.exports = function (options) {
     return !win.isMaximized() && !win.isMinimized() && !win.isFullScreen();
   }
 
+  function hasBounds() {
+    return state &&
+      state.x !== undefined &&
+      state.y !== undefined &&
+      state.width !== undefined &&
+      state.height !== undefined;
+  }
+
+  function validateState() {
+    var isValid = state && hasBounds();
+    if (isValid && state.displayBounds) {
+      // Check if the display where the window was last open is still available
+      var displayBounds = screen.getDisplayMatching(state).bounds;
+      isValid = deepEqual(state.displayBounds, displayBounds, {strict: true});
+    }
+    return isValid;
+  }
+
+  function updateState(win) {
+    win = win || winRef;
+    if (!win) {
+      return;
+    }
+
+    var winBounds = win.getBounds();
+    if (isNormal(win)) {
+      state.x = winBounds.x;
+      state.y = winBounds.y;
+      state.width = winBounds.width;
+      state.height = winBounds.height;
+    }
+    state.isMaximized = win.isMaximized();
+    state.displayBounds = screen.getDisplayMatching(winBounds).bounds;
+  }
+
   function saveState(win) {
+    // Update window state only if it was provided
     if (win) {
-      // Update state
-      var winBounds = win.getBounds();
-      if (isNormal(win)) {
-        state.x = winBounds.x;
-        state.y = winBounds.y;
-        state.width = winBounds.width;
-        state.height = winBounds.height;
-      }
-      state.isMaximized = win.isMaximized();
-      state.displayBounds = screen.getDisplayMatching(winBounds).bounds;
+      updateState(win);
     }
 
     // Save state
@@ -47,34 +73,14 @@ module.exports = function (options) {
     }
   }
 
-  function resizeHandler() {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(function () {
-      var winBounds = winRef.getBounds();
-      if (isNormal(winRef)) {
-        state.x = winBounds.x;
-        state.y = winBounds.y;
-        state.width = winBounds.width;
-        state.height = winBounds.height;
-      }
-    }, eventHandlingDelay);
-  }
-
-  function moveHandler() {
-    clearTimeout(moveTimer);
-    moveTimer = setTimeout(function () {
-      var winBounds = winRef.getBounds();
-      if (isNormal(winRef)) {
-        state.x = winBounds.x;
-        state.y = winBounds.y;
-      }
-    }, eventHandlingDelay);
+  function stateChangeHandler() {
+    // Handles both 'resize' and 'move'
+    clearTimeout(stateChangeTimer);
+    stateChangeTimer = setTimeout(updateState, eventHandlingDelay);
   }
 
   function closeHandler() {
-    // Note: We wrap saveState because the first parameter of the close event is
-    // an event object and not the window object like it expects
-    saveState(winRef);
+    updateState();
   }
 
   function closedHandler() {
@@ -84,8 +90,8 @@ module.exports = function (options) {
   }
 
   function register(win) {
-    win.on('resize', resizeHandler);
-    win.on('move', moveHandler);
+    win.on('resize', stateChangeHandler);
+    win.on('move', stateChangeHandler);
     win.on('close', closeHandler);
     win.on('closed', closedHandler);
     winRef = win;
@@ -93,10 +99,9 @@ module.exports = function (options) {
 
   function unregister() {
     if (winRef) {
-      winRef.removeListener('resize', resizeHandler);
-      clearTimeout(resizeTimer);
-      winRef.removeListener('move', moveHandler);
-      clearTimeout(moveTimer);
+      winRef.removeListener('resize', stateChangeHandler);
+      winRef.removeListener('move', stateChangeHandler);
+      clearTimeout(stateChangeTimer);
       winRef.removeListener('close', closeHandler);
       winRef.removeListener('closed', closedHandler);
       winRef = null;
@@ -110,22 +115,16 @@ module.exports = function (options) {
     // Don't care
   }
 
-  // If the display where the app window was displayed is no longer available,
-  // we should drop the stored state
-  if (state && state.displayBounds) {
-    var displayBounds = screen.getDisplayMatching(state).bounds;
-    if (!deepEqual(state.displayBounds, displayBounds, {strict: true})) {
-      state = null;
-    }
+  // Check state validity
+  if (!validateState()) {
+    state = null;
   }
 
-  // Set state defaults if needed
-  if (!state) {
-    state = {
-      width: config.defaultWidth || 800,
-      height: config.defaultHeight || 600
-    };
-  }
+  // Set state fallback values
+  state = objectAssign({
+    width: config.defaultWidth || 800,
+    height: config.defaultHeight || 600
+  }, state);
 
   return {
     get x() { return state.x; },
