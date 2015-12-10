@@ -1,7 +1,6 @@
 'use strict';
 
 var app = require('app');
-var screen = require('screen');
 var jsonfile = require('jsonfile');
 var path = require('path');
 var mkdirp = require('mkdirp');
@@ -9,58 +8,46 @@ var objectAssign = require('object-assign');
 var deepEqual = require('deep-equal');
 
 module.exports = function (options) {
+  var screen = require('screen');
+  var state;
+  var winRef;
+  var resizeTimer;
+  var moveTimer;
+  var eventHandlingDelay = 100;
   var config = objectAssign({}, {
     file: 'window-state.json',
     path: app.getPath('userData')
   }, options);
   var fullStoreFileName = path.join(config.path, config.file);
-  // Number of milliseconds to postpone handling the event
-  var delay = 100;
-  var state;
-  var winRef;
 
-  try {
-    state = jsonfile.readFileSync(fullStoreFileName);
-  } catch (err) {
-    // Don't care
-  }
-
-  if (state && state.displayBounds) {
-    // If the display where the app window was displayed is no longer available,
-    // we should drop the stored state
-    var displayBounds = screen.getDisplayMatching(state).bounds;
-    if (!deepEqual(state.displayBounds, displayBounds, {strict: true})) {
-      state = null;
-    }
-  }
-
-  if (!state) {
-    state = {
-      width: config.defaultWidth || 800,
-      height: config.defaultHeight || 600
-    };
-  }
-
-  var isNormal = function (win) {
+  function isNormal(win) {
     return !win.isMaximized() && !win.isMinimized() && !win.isFullScreen();
-  };
+  }
 
-  var saveState = function (win) {
-    var winBounds = win.getBounds();
-    if (isNormal(win)) {
-      state.x = winBounds.x;
-      state.y = winBounds.y;
-      state.width = winBounds.width;
-      state.height = winBounds.height;
+  function saveState(win) {
+    if (win) {
+      // Update state
+      var winBounds = win.getBounds();
+      if (isNormal(win)) {
+        state.x = winBounds.x;
+        state.y = winBounds.y;
+        state.width = winBounds.width;
+        state.height = winBounds.height;
+      }
+      state.isMaximized = win.isMaximized();
+      state.displayBounds = screen.getDisplayMatching(winBounds).bounds;
     }
-    state.isMaximized = win.isMaximized();
-    state.displayBounds = screen.getDisplayMatching(winBounds).bounds;
-    mkdirp.sync(path.dirname(fullStoreFileName));
-    jsonfile.writeFileSync(fullStoreFileName, state);
-  };
 
-  var resizeTimer;
-  var resizeHandler = function () {
+    // Save state
+    try {
+      mkdirp.sync(path.dirname(fullStoreFileName));
+      jsonfile.writeFileSync(fullStoreFileName, state);
+    } catch (e) {
+      // Don't care
+    }
+  }
+
+  function resizeHandler() {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(function () {
       var winBounds = winRef.getBounds();
@@ -70,11 +57,10 @@ module.exports = function (options) {
         state.width = winBounds.width;
         state.height = winBounds.height;
       }
-    }, delay);
-  };
+    }, eventHandlingDelay);
+  }
 
-  var moveTimer;
-  var moveHandler = function () {
+  function moveHandler() {
     clearTimeout(moveTimer);
     moveTimer = setTimeout(function () {
       var winBounds = winRef.getBounds();
@@ -82,34 +68,64 @@ module.exports = function (options) {
         state.x = winBounds.x;
         state.y = winBounds.y;
       }
-    }, delay);
-  };
+    }, eventHandlingDelay);
+  }
 
-  var closeHandler = function () {
+  function closeHandler() {
     // Note: We wrap saveState because the first parameter of the close event is
     // an event object and not the window object like it expects
     saveState(winRef);
-  };
+  }
 
-  var unregister = function () {
+  function closedHandler() {
+    // Unregister listeners and save state
+    unregister();
+    saveState();
+  }
+
+  function register(win) {
+    win.on('resize', resizeHandler);
+    win.on('move', moveHandler);
+    win.on('close', closeHandler);
+    win.on('closed', closedHandler);
+    winRef = win;
+  }
+
+  function unregister() {
     if (winRef) {
       winRef.removeListener('resize', resizeHandler);
       clearTimeout(resizeTimer);
       winRef.removeListener('move', moveHandler);
       clearTimeout(moveTimer);
       winRef.removeListener('close', closeHandler);
-      winRef.removeListener('closed', unregister);
+      winRef.removeListener('closed', closedHandler);
       winRef = null;
     }
-  };
+  }
 
-  var register = function (win) {
-    win.on('resize', resizeHandler);
-    win.on('move', moveHandler);
-    win.on('close', closeHandler);
-    win.on('closed', unregister);
-    winRef = win;
-  };
+  // Load previous state
+  try {
+    state = jsonfile.readFileSync(fullStoreFileName);
+  } catch (err) {
+    // Don't care
+  }
+
+  // If the display where the app window was displayed is no longer available,
+  // we should drop the stored state
+  if (state && state.displayBounds) {
+    var displayBounds = screen.getDisplayMatching(state).bounds;
+    if (!deepEqual(state.displayBounds, displayBounds, {strict: true})) {
+      state = null;
+    }
+  }
+
+  // Set state defaults if needed
+  if (!state) {
+    state = {
+      width: config.defaultWidth || 800,
+      height: config.defaultHeight || 600
+    };
+  }
 
   return {
     get x() { return state.x; },

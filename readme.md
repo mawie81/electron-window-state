@@ -14,12 +14,10 @@ $ npm install --save electron-window-state
 ## Usage
 
 ```js
+const windowStateKeeper = require('electron-window-state');
 let win;
 
 app.on('ready', function () {
-  // Require the module only after the ready event was fired
-  const windowStateKeeper = require('electron-window-state');
-
   // Load the previous state with fallback to defaults
   let mainWindowState = windowStateKeeper({
     defaultWidth: 1000,
@@ -48,6 +46,8 @@ app.on('ready', function () {
 ## API
 
 #### windowStateKeeper(opts)
+
+Note: Don't call this function before the `ready` event is fired.
 
 ##### opts
 
@@ -116,8 +116,8 @@ const windowState = windowStateKeeper({
 
 `saveState(window)` - *Function*
 
-  Saves the current state of the given `BrowserWindow`. This exists for legacy
-  purposes, use `register` instead.
+  Saves the current state of the given `BrowserWindow`. This exists mostly for
+  legacy purposes, and in most cases it's better to just use `register`.
 
 ## License
 
