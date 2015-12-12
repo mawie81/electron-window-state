@@ -32,14 +32,10 @@ app.on('ready', function () {
     'height': mainWindowState.height
   });
 
-  // Maximize the window if it was maximized last time
-  if (mainWindowState.isMaximized) {
-    win.maximize();
-  }
-
   // Let us register listeners on the window, so we can update the state
   // automatically (the listeners will be removed when the window is closed)
-  mainWindowState.register(win);
+  // and maximize the window for you if it was last closed maximized
+  mainWindowState.manage(win);
 });
 ```
 
@@ -53,11 +49,11 @@ Note: Don't call this function before the `ready` event is fired.
 
 `defaultWidth` - *Number*
 
-  The width that should be returned if no file exists yet. Defaults to 800.
+  The width that should be returned if no file exists yet. Defaults to `800`.
 
 `defaultHeight` - *Number*
 
-  The height that should be returned if no file exists yet. Defaults to 600.
+  The height that should be returned if no file exists yet. Defaults to `600`.
 
 `path` - *String*
 
@@ -67,6 +63,11 @@ Note: Don't call this function before the `ready` event is fired.
 `file` - *String*
 
   The name of file. Defaults to `window-state.json`
+
+`maximize` - *Boolean*
+
+    Should we maximize the window for you, if it was last closed maximized.
+    Defaults to `true`  
 
 ### state object
 
@@ -102,22 +103,16 @@ const windowState = windowStateKeeper({
   `true` if the window state was saved while the the window was maximized.
   `undefined` if the state has not been saved yet.
 
-`register(window)` - *Function*
+`manage(window)` - *Function*
 
   Register listeners on the given `BrowserWindow` for events that are
   related to size or position changes (`resize`, `move`). When the window is
   closed we automatically remove the listeners and save the state.
 
-`unregister()` - *Function*
-
-  Unregister listeners that were previously registered with `register`. You
-  usually don't need to call this, since it's taken care of automatically when
-  the window is closed.
-
 `saveState(window)` - *Function*
 
   Saves the current state of the given `BrowserWindow`. This exists mostly for
-  legacy purposes, and in most cases it's better to just use `register`.
+  legacy purposes, and in most cases it's better to just use `manage`.
 
 ## License
 

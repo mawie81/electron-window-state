@@ -13,9 +13,10 @@ module.exports = function (options) {
   var winRef;
   var stateChangeTimer;
   var eventHandlingDelay = 100;
-  var config = objectAssign({}, {
+  var config = objectAssign({
     file: 'window-state.json',
-    path: app.getPath('userData')
+    path: app.getPath('userData'),
+    maximize: true
   }, options);
   var fullStoreFileName = path.join(config.path, config.file);
 
@@ -85,11 +86,14 @@ module.exports = function (options) {
 
   function closedHandler() {
     // Unregister listeners and save state
-    unregister();
+    unmanage();
     saveState();
   }
 
-  function register(win) {
+  function manage(win) {
+    if (config.maximize && state.isMaximized) {
+      win.maximize();
+    }
     win.on('resize', stateChangeHandler);
     win.on('move', stateChangeHandler);
     win.on('close', closeHandler);
@@ -97,7 +101,7 @@ module.exports = function (options) {
     winRef = win;
   }
 
-  function unregister() {
+  function unmanage() {
     if (winRef) {
       winRef.removeListener('resize', stateChangeHandler);
       winRef.removeListener('move', stateChangeHandler);
@@ -133,7 +137,6 @@ module.exports = function (options) {
     get height() { return state.height; },
     get isMaximized() { return state.isMaximized; },
     saveState: saveState,
-    register: register,
-    unregister: unregister
+    manage: manage
   };
 };
