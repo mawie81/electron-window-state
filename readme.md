@@ -34,7 +34,7 @@ app.on('ready', function () {
 
   // Let us register listeners on the window, so we can update the state
   // automatically (the listeners will be removed when the window is closed)
-  // and maximize the window for you if it was last closed maximized
+  // and restore the maximized or full screen state
   mainWindowState.manage(win);
 });
 ```
@@ -66,8 +66,13 @@ Note: Don't call this function before the `ready` event is fired.
 
 `maximize` - *Boolean*
 
-    Should we maximize the window for you, if it was last closed maximized.
-    Defaults to `true`  
+  Should we automatically maximize the window, if it was last closed
+  maximized. Defaults to `true`
+
+`fullScreen` - *Boolean*
+
+  Should we automatically restore the window to full screen, if it was last
+  closed full screen. Defaults to `true`
 
 ### state object
 
@@ -103,11 +108,18 @@ const windowState = windowStateKeeper({
   `true` if the window state was saved while the the window was maximized.
   `undefined` if the state has not been saved yet.
 
+`isFullScreen` - *Boolean*
+
+  `true` if the window state was saved while the the window was in full screen
+  mode. `undefined` if the state has not been saved yet.
+
 `manage(window)` - *Function*
 
   Register listeners on the given `BrowserWindow` for events that are
-  related to size or position changes (`resize`, `move`). When the window is
-  closed we automatically remove the listeners and save the state.
+  related to size or position changes (`resize`, `move`). It will also restore
+  the window's maximized or full screen state.
+  When the window is closed we automatically remove the listeners and save the
+  state.
 
 `saveState(window)` - *Function*
 

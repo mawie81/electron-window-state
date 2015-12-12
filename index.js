@@ -16,7 +16,8 @@ module.exports = function (options) {
   var config = objectAssign({
     file: 'window-state.json',
     path: app.getPath('userData'),
-    maximize: true
+    maximize: true,
+    fullScreen: true
   }, options);
   var fullStoreFileName = path.join(config.path, config.file);
 
@@ -56,6 +57,7 @@ module.exports = function (options) {
       state.height = winBounds.height;
     }
     state.isMaximized = win.isMaximized();
+    state.isFullScreen = win.isFullScreen();
     state.displayBounds = screen.getDisplayMatching(winBounds).bounds;
   }
 
@@ -93,6 +95,9 @@ module.exports = function (options) {
   function manage(win) {
     if (config.maximize && state.isMaximized) {
       win.maximize();
+    }
+    if (config.fullScreen && state.isFullScreen) {
+      win.setFullScreen(true);
     }
     win.on('resize', stateChangeHandler);
     win.on('move', stateChangeHandler);
@@ -136,6 +141,7 @@ module.exports = function (options) {
     get width() { return state.width; },
     get height() { return state.height; },
     get isMaximized() { return state.isMaximized; },
+    get isFullScreen() { return state.isFullScreen; },
     saveState: saveState,
     manage: manage
   };
