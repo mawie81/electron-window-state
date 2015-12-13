@@ -16,6 +16,7 @@
     "electron"
   ],
   "dependencies": {
+    "deep-equal": "^1.0.1",
     "jsonfile": "^2.2.3",
     "mkdirp": "^0.5.1",
     "object-assign": "^4.0.1"
