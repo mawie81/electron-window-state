@@ -10,10 +10,13 @@
     "node": ">=0.12.0"
   },
   "scripts": {
-    "test": "xo"
+    "test": "xo && ava"
   },
   "keywords": [
     "electron"
+  ],
+  "files": [
+    "index.js"
   ],
   "dependencies": {
     "deep-equal": "^1.0.1",
@@ -22,6 +25,9 @@
     "object-assign": "^4.0.1"
   },
   "devDependencies": {
+    "ava": "^0.7.0",
+    "mockery": "^1.4.0",
+    "sinon": "^1.17.2",
     "xo": "^0.11.2"
   },
   "xo": {
