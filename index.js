@@ -143,6 +143,7 @@ module.exports = function (options) {
     get isMaximized() { return state.isMaximized; },
     get isFullScreen() { return state.isFullScreen; },
     saveState: saveState,
+    unmanage: unmanage,
     manage: manage
   };
 };
