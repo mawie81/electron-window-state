@@ -121,6 +121,11 @@ const windowState = windowStateKeeper({
   When the window is closed we automatically remove the listeners and save the
   state.
 
+`unmanage` - *Function*
+
+  Removes all listeners of the managed `BrowserWindow` in case it does not
+  need to be managed anymore.
+
 `saveState(window)` - *Function*
 
   Saves the current state of the given `BrowserWindow`. This exists mostly for
