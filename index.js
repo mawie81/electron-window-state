@@ -1,6 +1,7 @@
 'use strict';
 
-var app = require('app');
+var electron = require('electron');
+var app = electron.app;
 var jsonfile = require('jsonfile');
 var path = require('path');
 var mkdirp = require('mkdirp');
@@ -8,7 +9,7 @@ var objectAssign = require('object-assign');
 var deepEqual = require('deep-equal');
 
 module.exports = function (options) {
-  var screen = require('screen');
+  var screen = electron.screen;
   var state;
   var winRef;
   var stateChangeTimer;
