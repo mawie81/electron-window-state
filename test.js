@@ -7,9 +7,12 @@ test.before(() => {
     writeFileSync: function () {},
     readFileSync: function () {}
   };
+  const electronMock = {
+    app: {getPath: function () {return '/temp';}},
+    screen: {getDisplayMatching: function () {}}
+  };
   mockery.registerAllowables(['./', 'path', 'object-assign', 'deep-equal', 'sinon', './lib/keys.js', './lib/is_arguments.js']);
-  mockery.registerMock('app', {getPath: function () {return '/temp';}});
-  mockery.registerMock('screen', {getDisplayMatching: function () {}});
+  mockery.registerMock('electron', electronMock);
   mockery.registerMock('mkdirp', {sync: function () {}});
   mockery.registerMock('jsonfile', jsonfileMock);
   mockery.enable({useCleanCache: true});
@@ -103,7 +106,7 @@ test('saves the state to the file system', t => {
   const jsonfile = require('jsonfile');
   sinon.spy(jsonfile, 'writeFileSync');
 
-  const screen = require('screen');
+  const screen = require('electron').screen;
   sinon.stub(screen, 'getDisplayMatching').returns({bounds: screenBounds});
 
   const state = require('./')({defaultWidth: 1000, defaultHeight: 2000});
