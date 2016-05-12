@@ -15,7 +15,9 @@
   "keywords": [
     "electron"
   ],
-  "main": "index.js",
+  "files": [
+    "index.js"
+  ],
   "dependencies": {
     "deep-equal": "^1.0.1",
     "jsonfile": "^2.2.3",
