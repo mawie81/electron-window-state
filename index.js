@@ -35,8 +35,8 @@ module.exports = function (options) {
   }
 
   function validateState() {
-    var isValid = state && hasBounds();
-    if (isValid && state.displayBounds) {
+    var isValid = state && (hasBounds() || state.isMaximized || state.isFullScreen);
+    if (hasBounds() && state.displayBounds) {
       // Check if the display where the window was last open is still available
       var displayBounds = screen.getDisplayMatching(state).bounds;
       isValid = deepEqual(state.displayBounds, displayBounds, {strict: true});
