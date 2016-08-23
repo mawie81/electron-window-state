@@ -47,6 +47,52 @@ test('tries to read state file from the configured source', t => {
   jsonfile.readFileSync.restore();
 });
 
+test('considers the state invalid if without bounds', t => {
+  const jsonfile = require('jsonfile');
+  sinon.stub(jsonfile, 'readFileSync').returns({
+    width: 100
+  });
+
+  const state = require('./')({
+    defaultWidth: 200
+  });
+
+  t.not(state.width, 100);
+  jsonfile.readFileSync.restore();
+});
+
+test('considers the state valid if without bounds but isMaximized is true', t => {
+  const jsonfile = require('jsonfile');
+  sinon.stub(jsonfile, 'readFileSync').returns({
+    isMaximized: true,
+    width: 100
+  });
+
+  const state = require('./')({
+    defaultWidth: 200
+  });
+
+  t.true(state.isMaximized);
+  t.is(state.width, 100);
+  jsonfile.readFileSync.restore();
+});
+
+test('considers the state valid if without bounds but isFullScreen is true', t => {
+  const jsonfile = require('jsonfile');
+  sinon.stub(jsonfile, 'readFileSync').returns({
+    isFullScreen: true,
+    width: 100
+  });
+
+  const state = require('./')({
+    defaultWidth: 200
+  });
+
+  t.true(state.isFullScreen);
+  t.is(state.width, 100);
+  jsonfile.readFileSync.restore();
+});
+
 test('returns the defaults if the state in the file is invalid', t => {
   const jsonfile = require('jsonfile');
   sinon.stub(jsonfile, 'readFileSync').returns({});
