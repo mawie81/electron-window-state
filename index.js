@@ -46,7 +46,7 @@ module.exports = function (options) {
       var displayBounds = screen.getDisplayMatching(state).bounds;
       var sameBounds = deepEqual(state.displayBounds, displayBounds, {strict: true});
       if (!sameBounds) {
-        if (displayBounds.width < state.displayBounds) {
+        if (displayBounds.width < state.displayBounds.width) {
           if (state.x > displayBounds.width) {
             state.x = null;
           }
@@ -56,7 +56,7 @@ module.exports = function (options) {
           }
         }
 
-        if (displayBounds.height < state.displayBounds) {
+        if (displayBounds.height < state.displayBounds.height) {
           if (state.y > displayBounds.height) {
             state.y = null;
           }
