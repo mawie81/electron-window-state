@@ -36,12 +36,37 @@ module.exports = function (options) {
 
   function validateState() {
     var isValid = state && (hasBounds() || state.isMaximized || state.isFullScreen);
+    if (!isValid) {
+      state = null;
+      return;
+    }
+
     if (hasBounds() && state.displayBounds) {
       // Check if the display where the window was last open is still available
       var displayBounds = screen.getDisplayMatching(state).bounds;
-      isValid = deepEqual(state.displayBounds, displayBounds, {strict: true});
+      var sameBounds = deepEqual(state.displayBounds, displayBounds, {strict: true});
+      if (!sameBounds) {
+        if (displayBounds.width < state.displayBounds.width) {
+          if (state.x > displayBounds.width) {
+            state.x = null;
+          }
+
+          if (state.width > displayBounds.width) {
+            state.width = displayBounds.width;
+          }
+        }
+
+        if (displayBounds.height < state.displayBounds.height) {
+          if (state.y > displayBounds.height) {
+            state.y = null;
+          }
+
+          if (state.height > displayBounds.height) {
+            state.height = displayBounds.height;
+          }
+        }
+      }
     }
-    return isValid;
   }
 
   function updateState(win) {
@@ -126,9 +151,7 @@ module.exports = function (options) {
   }
 
   // Check state validity
-  if (!validateState()) {
-    state = null;
-  }
+  validateState();
 
   // Set state fallback values
   state = objectAssign({
