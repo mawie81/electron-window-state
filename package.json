@@ -7,7 +7,7 @@
   "main": "index.js",
   "author": "Marcel Wiehle",
   "engines": {
-    "node": ">=0.12.0"
+    "node": ">=4.0.0"
   },
   "scripts": {
     "test": "xo && ava"
@@ -21,14 +21,13 @@
   "dependencies": {
     "deep-equal": "^1.0.1",
     "jsonfile": "^2.2.3",
-    "mkdirp": "^0.5.1",
-    "object-assign": "^4.0.1"
+    "mkdirp": "^0.5.1"
   },
   "devDependencies": {
-    "ava": "^0.7.0",
+    "ava": "^0.17.0",
     "mockery": "^1.4.0",
     "sinon": "^1.17.2",
-    "xo": "^0.11.2"
+    "xo": "^0.17.1"
   },
   "xo": {
     "space": true,

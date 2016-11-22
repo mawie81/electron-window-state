@@ -1,20 +1,19 @@
 'use strict';
 
-var electron = require('electron');
-var app = electron.app;
-var jsonfile = require('jsonfile');
 var path = require('path');
+var electron = require('electron');
+var jsonfile = require('jsonfile');
 var mkdirp = require('mkdirp');
-var objectAssign = require('object-assign');
 var deepEqual = require('deep-equal');
 
 module.exports = function (options) {
+  var app = electron.app;
   var screen = electron.screen;
   var state;
   var winRef;
   var stateChangeTimer;
   var eventHandlingDelay = 100;
-  var config = objectAssign({
+  var config = Object.assign({
     file: 'window-state.json',
     path: app.getPath('userData'),
     maximize: true,
@@ -97,7 +96,7 @@ module.exports = function (options) {
     try {
       mkdirp.sync(path.dirname(fullStoreFileName));
       jsonfile.writeFileSync(fullStoreFileName, state);
-    } catch (e) {
+    } catch (err) {
       // Don't care
     }
   }
@@ -154,7 +153,7 @@ module.exports = function (options) {
   validateState();
 
   // Set state fallback values
-  state = objectAssign({
+  state = Object.assign({
     width: config.defaultWidth || 800,
     height: config.defaultHeight || 600
   }, state);
