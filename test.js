@@ -126,8 +126,8 @@ test('maximize and set the window fullscreen if enabled', t => {
   const state = require('./')({defaultWidth: 1000, defaultHeight: 2000});
   state.manage(win);
 
-  t.ok(win.maximize.calledOnce);
-  t.ok(win.setFullScreen.calledOnce);
+  t.truthy(win.maximize.calledOnce);
+  t.truthy(win.setFullScreen.calledOnce);
   jsonfile.readFileSync.restore();
 });
 
@@ -158,8 +158,8 @@ test('saves the state to the file system', t => {
   const state = require('./')({defaultWidth: 1000, defaultHeight: 2000});
   state.saveState(win);
 
-  t.ok(mkdirp.sync.calledOnce);
-  t.ok(jsonfile.writeFileSync.calledWith('/temp/window-state.json', {
+  t.truthy(mkdirp.sync.calledOnce);
+  t.truthy(jsonfile.writeFileSync.calledWith('/temp/window-state.json', {
     x: 100,
     y: 100,
     width: 500,
