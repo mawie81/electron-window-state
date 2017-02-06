@@ -27,10 +27,10 @@ module.exports = function (options) {
 
   function hasBounds() {
     return state &&
-      state.x !== undefined &&
-      state.y !== undefined &&
-      state.width !== undefined &&
-      state.height !== undefined;
+      Number.isInteger(state.x) &&
+      Number.isInteger(state.y) &&
+      Number.isInteger(state.width) &&
+      Number.isInteger(state.height);
   }
 
   function validateState() {
