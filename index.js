@@ -85,8 +85,7 @@ module.exports = function (options) {
       state.isMaximized = win.isMaximized();
       state.isFullScreen = win.isFullScreen();
       state.displayBounds = screen.getDisplayMatching(winBounds).bounds;
-    }
-    catch(e) {}
+    } catch (err) {}
   }
 
   function saveState(win) {
