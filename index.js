@@ -7,8 +7,8 @@ var mkdirp = require('mkdirp');
 var deepEqual = require('deep-equal');
 
 module.exports = function (options) {
-  var app = electron.app;
-  var screen = electron.screen;
+  var app = electron.app || electron.remote.app;
+  var screen = electron.screen || electron.remote.screen;
   var state;
   var winRef;
   var stateChangeTimer;
