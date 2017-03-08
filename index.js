@@ -73,17 +73,20 @@ module.exports = function (options) {
     if (!win) {
       return;
     }
-
-    var winBounds = win.getBounds();
-    if (isNormal(win)) {
-      state.x = winBounds.x;
-      state.y = winBounds.y;
-      state.width = winBounds.width;
-      state.height = winBounds.height;
+    // don't throw an error when window was closed
+    try {
+      var winBounds = win.getBounds();
+      if (isNormal(win)) {
+        state.x = winBounds.x;
+        state.y = winBounds.y;
+        state.width = winBounds.width;
+        state.height = winBounds.height;
+      }
+      state.isMaximized = win.isMaximized();
+      state.isFullScreen = win.isFullScreen();
+      state.displayBounds = screen.getDisplayMatching(winBounds).bounds;
     }
-    state.isMaximized = win.isMaximized();
-    state.isFullScreen = win.isFullScreen();
-    state.displayBounds = screen.getDisplayMatching(winBounds).bounds;
+    catch(e) {}
   }
 
   function saveState(win) {
