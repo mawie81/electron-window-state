@@ -7,8 +7,8 @@ var mkdirp = require('mkdirp');
 var deepEqual = require('deep-equal');
 
 module.exports = function (options) {
-  var app = electron.app;
-  var screen = electron.screen;
+  var app = electron.app || electron.remote.app;
+  var screen = electron.screen || electron.remote.screen;
   var state;
   var winRef;
   var stateChangeTimer;
@@ -73,17 +73,19 @@ module.exports = function (options) {
     if (!win) {
       return;
     }
-
-    var winBounds = win.getBounds();
-    if (isNormal(win)) {
-      state.x = winBounds.x;
-      state.y = winBounds.y;
-      state.width = winBounds.width;
-      state.height = winBounds.height;
-    }
-    state.isMaximized = win.isMaximized();
-    state.isFullScreen = win.isFullScreen();
-    state.displayBounds = screen.getDisplayMatching(winBounds).bounds;
+    // don't throw an error when window was closed
+    try {
+      var winBounds = win.getBounds();
+      if (isNormal(win)) {
+        state.x = winBounds.x;
+        state.y = winBounds.y;
+        state.width = winBounds.width;
+        state.height = winBounds.height;
+      }
+      state.isMaximized = win.isMaximized();
+      state.isFullScreen = win.isFullScreen();
+      state.displayBounds = screen.getDisplayMatching(winBounds).bounds;
+    } catch (err) {}
   }
 
   function saveState(win) {
