@@ -29,8 +29,8 @@ module.exports = function (options) {
     return state &&
       Number.isInteger(state.x) &&
       Number.isInteger(state.y) &&
-      Number.isInteger(state.width) &&
-      Number.isInteger(state.height);
+      Number.isInteger(state.width) && state.width > 0 &&
+      Number.isInteger(state.height) && state.height > 0;
   }
 
   function validateState() {
