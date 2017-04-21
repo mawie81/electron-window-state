@@ -39,6 +39,9 @@ app.on('ready', function () {
 });
 ```
 
+Please do not set `useContentSize` to `true` at creating `BrowserWindow` instance
+because it changes how to calculate window size.
+
 ## API
 
 #### windowStateKeeper(opts)
