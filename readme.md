@@ -39,6 +39,9 @@ app.on('ready', function () {
 });
 ```
 
+Please do not set `useContentSize` to `true` at creating `BrowserWindow` instance
+because it changes how to calculate window size.
+
 ## API
 
 #### windowStateKeeper(opts)
@@ -105,12 +108,12 @@ const windowState = windowStateKeeper({
 
 `isMaximized` - *Boolean*
 
-  `true` if the window state was saved while the the window was maximized.
+  `true` if the window state was saved while the window was maximized.
   `undefined` if the state has not been saved yet.
 
 `isFullScreen` - *Boolean*
 
-  `true` if the window state was saved while the the window was in full screen
+  `true` if the window state was saved while the window was in full screen
   mode. `undefined` if the state has not been saved yet.
 
 `manage(window)` - *Function*
