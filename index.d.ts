@@ -62,8 +62,6 @@ export type State = {
     // Saves the current state of the given BrowserWindow. This exists mostly for legacy purposes, and in most cases it's better to just use manage.
 }
 
-declare module 'electron-window-state' {
-    function module(opts: Options): State
+declare function module(opts: Options): State
 
-    export = module
-}
+export default module
