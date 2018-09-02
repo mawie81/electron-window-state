@@ -16,7 +16,8 @@
     "electron"
   ],
   "files": [
-    "index.js"
+    "index.js",
+    "index.d.ts"
   ],
   "dependencies": {
     "deep-equal": "^1.0.1",
