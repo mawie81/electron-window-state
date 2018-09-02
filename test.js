@@ -4,22 +4,25 @@ import sinon from 'sinon';
 
 test.before(() => {
   const jsonfileMock = {
-    writeFileSync: function () {},
-    readFileSync: function () {}
+    writeFileSync() {},
+    readFileSync() {}
   };
   const electronMock = {
-    app: {getPath: function () {return '/temp';}},
-    screen: {getDisplayMatching: function () {}}
+    app: {getPath() {return '/temp';}},
+    screen: {getDisplayMatching() {}}
   };
   mockery.registerAllowables(['./', 'path', 'object-assign', 'deep-equal', 'sinon', './lib/keys.js', './lib/is_arguments.js']);
   mockery.registerMock('electron', electronMock);
-  mockery.registerMock('mkdirp', {sync: function () {}});
+  mockery.registerMock('mkdirp', {sync() {}});
   mockery.registerMock('jsonfile', jsonfileMock);
-  mockery.enable({useCleanCache: true});
+  mockery.enable({
+    useCleanCache: true,
+    warnOnReplace: false,
+    warnOnUnregistered: false});
 });
 
 test('returns defaultWidth and defaultHeight if no state exists', t => {
-  const state = require('./')({defaultWidth: 1000, defaultHeight: 2000});
+  const state = require('.')({defaultWidth: 1000, defaultHeight: 2000});
 
   t.is(state.width, 1000);
   t.is(state.height, 2000);
@@ -29,7 +32,7 @@ test('tries to read state file from the default location', t => {
   const jsonfile = require('jsonfile');
   sinon.spy(jsonfile, 'readFileSync');
 
-  require('./')({defaultWidth: 1000, defaultHeight: 2000});
+  require('.')({defaultWidth: 1000, defaultHeight: 2000});
 
   t.true(jsonfile.readFileSync.calledOnce);
   t.true(jsonfile.readFileSync.calledWith('/temp/window-state.json'));
@@ -40,7 +43,7 @@ test('tries to read state file from the configured source', t => {
   const jsonfile = require('jsonfile');
   sinon.spy(jsonfile, 'readFileSync');
 
-  require('./')({defaultWidth: 1000, defaultHeight: 2000, path: '/data', file: 'state.json'});
+  require('.')({defaultWidth: 1000, defaultHeight: 2000, path: '/data', file: 'state.json'});
 
   t.true(jsonfile.readFileSync.calledOnce);
   t.true(jsonfile.readFileSync.calledWith('/data/state.json'));
@@ -53,7 +56,7 @@ test('considers the state invalid if without bounds', t => {
     width: 100
   });
 
-  const state = require('./')({
+  const state = require('.')({
     defaultWidth: 200
   });
 
@@ -68,7 +71,7 @@ test('considers the state valid if without bounds but isMaximized is true', t =>
     width: 100
   });
 
-  const state = require('./')({
+  const state = require('.')({
     defaultWidth: 200
   });
 
@@ -84,7 +87,7 @@ test('considers the state valid if without bounds but isFullScreen is true', t =
     width: 100
   });
 
-  const state = require('./')({
+  const state = require('.')({
     defaultWidth: 200
   });
 
@@ -97,7 +100,7 @@ test('returns the defaults if the state in the file is invalid', t => {
   const jsonfile = require('jsonfile');
   sinon.stub(jsonfile, 'readFileSync').returns({});
 
-  const state = require('./')({defaultWidth: 1000, defaultHeight: 2000});
+  const state = require('.')({defaultWidth: 1000, defaultHeight: 2000});
 
   t.is(state.width, 1000);
   t.is(state.height, 2000);
@@ -123,7 +126,7 @@ test('maximize and set the window fullscreen if enabled', t => {
     on: sinon.spy()
   };
 
-  const state = require('./')({defaultWidth: 1000, defaultHeight: 2000});
+  const state = require('.')({defaultWidth: 1000, defaultHeight: 2000});
   state.manage(win);
 
   t.truthy(win.maximize.calledOnce);
@@ -152,10 +155,10 @@ test('saves the state to the file system', t => {
   const jsonfile = require('jsonfile');
   sinon.spy(jsonfile, 'writeFileSync');
 
-  const screen = require('electron').screen;
+  const {screen} = require('electron');
   sinon.stub(screen, 'getDisplayMatching').returns({bounds: screenBounds});
 
-  const state = require('./')({defaultWidth: 1000, defaultHeight: 2000});
+  const state = require('.')({defaultWidth: 1000, defaultHeight: 2000});
   state.saveState(win);
 
   t.truthy(mkdirp.sync.calledOnce);

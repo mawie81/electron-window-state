@@ -1,25 +1,25 @@
 'use strict';
 
-var path = require('path');
-var electron = require('electron');
-var jsonfile = require('jsonfile');
-var mkdirp = require('mkdirp');
-var deepEqual = require('deep-equal');
+const path = require('path');
+const electron = require('electron');
+const jsonfile = require('jsonfile');
+const mkdirp = require('mkdirp');
+const deepEqual = require('deep-equal');
 
 module.exports = function (options) {
-  var app = electron.app || electron.remote.app;
-  var screen = electron.screen || electron.remote.screen;
-  var state;
-  var winRef;
-  var stateChangeTimer;
-  var eventHandlingDelay = 100;
-  var config = Object.assign({
+  const app = electron.app || electron.remote.app;
+  const screen = electron.screen || electron.remote.screen;
+  let state;
+  let winRef;
+  let stateChangeTimer;
+  const eventHandlingDelay = 100;
+  const config = Object.assign({
     file: 'window-state.json',
     path: app.getPath('userData'),
     maximize: true,
     fullScreen: true
   }, options);
-  var fullStoreFileName = path.join(config.path, config.file);
+  const fullStoreFileName = path.join(config.path, config.file);
 
   function isNormal(win) {
     return !win.isMaximized() && !win.isMinimized() && !win.isFullScreen();
@@ -34,7 +34,7 @@ module.exports = function (options) {
   }
 
   function validateState() {
-    var isValid = state && (hasBounds() || state.isMaximized || state.isFullScreen);
+    const isValid = state && (hasBounds() || state.isMaximized || state.isFullScreen);
     if (!isValid) {
       state = null;
       return;
@@ -42,8 +42,8 @@ module.exports = function (options) {
 
     if (hasBounds() && state.displayBounds) {
       // Check if the display where the window was last open is still available
-      var displayBounds = screen.getDisplayMatching(state).bounds;
-      var sameBounds = deepEqual(state.displayBounds, displayBounds, {strict: true});
+      const displayBounds = screen.getDisplayMatching(state).bounds;
+      const sameBounds = deepEqual(state.displayBounds, displayBounds, {strict: true});
       if (!sameBounds) {
         if (displayBounds.width < state.displayBounds.width) {
           if (state.x > displayBounds.width) {
@@ -73,9 +73,9 @@ module.exports = function (options) {
     if (!win) {
       return;
     }
-    // don't throw an error when window was closed
+    // Don't throw an error when window was closed
     try {
-      var winBounds = win.getBounds();
+      const winBounds = win.getBounds();
       if (isNormal(win)) {
         state.x = winBounds.x;
         state.y = winBounds.y;
@@ -167,8 +167,8 @@ module.exports = function (options) {
     get height() { return state.height; },
     get isMaximized() { return state.isMaximized; },
     get isFullScreen() { return state.isFullScreen; },
-    saveState: saveState,
-    unmanage: unmanage,
-    manage: manage
+    saveState,
+    unmanage,
+    manage
   };
 };
