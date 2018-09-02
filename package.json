@@ -32,7 +32,9 @@
   },
   "xo": {
     "space": true,
-    "ignores": ["index.d.ts"],
+    "ignores": [
+      "index.d.ts"
+    ],
     "rules": {
       "brace-style": [
         2,
@@ -40,7 +42,8 @@
         {
           "allowSingleLine": true
         }
-      ]
+      ],
+      "prefer-object-spread": 0
     }
   }
 }
