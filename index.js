@@ -165,6 +165,7 @@ module.exports = function (options) {
     get y() { return state.y; },
     get width() { return state.width; },
     get height() { return state.height; },
+    get displayBounds() { return state.displayBounds; },
     get isMaximized() { return state.isMaximized; },
     get isFullScreen() { return state.isFullScreen; },
     saveState,
