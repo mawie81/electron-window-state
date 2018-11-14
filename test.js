@@ -228,8 +228,8 @@ test('Ensure window is visible at startup if saved display is unavailable and wa
 
   t.is(state.x, 0);
   t.is(state.y, 0);
-  t.is(state.width, 1920);
-  t.is(state.height, 1080);
+  t.is(state.width, 500);
+  t.is(state.height, 300);
 
   jsonfile.readFileSync.restore();
   screen.getDisplayMatching.restore();
@@ -256,8 +256,37 @@ test('Ensure window is visible at startup if saved display is unavailable and wa
 
   t.is(state.x, 0);
   t.is(state.y, 0);
-  t.is(state.width, 1920);
-  t.is(state.height, 1080);
+  t.is(state.width, 500);
+  t.is(state.height, 300);
+
+  jsonfile.readFileSync.restore();
+  screen.getDisplayMatching.restore();
+});
+
+test('Reset state to default values if saved display is unavailable', t => {
+  const jsonfile = require('jsonfile');
+  sinon.stub(jsonfile, 'readFileSync').returns({
+    x: -2000,
+    y: -1000,
+    width: 800,
+    height: 600,
+    displayBounds: {x: -2560, y: -480, width: 2560, height: 1440}
+  });
+
+  const {screen} = require('electron');
+  const screenBounds = {x: 0, y: 0, width: 1920, height: 1080};
+  sinon.stub(screen, 'getDisplayMatching').returns({bounds: screenBounds});
+
+  const state = require('.')({
+    defaultWidth: 500,
+    defaultHeight: 300
+  });
+
+  t.is(state.x, 0);
+  t.is(state.y, 0);
+  t.is(state.width, 500);
+  t.is(state.height, 300);
+  t.is(state.displayBounds, screenBounds);
 
   jsonfile.readFileSync.restore();
   screen.getDisplayMatching.restore();

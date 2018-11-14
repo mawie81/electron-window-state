@@ -45,25 +45,14 @@ module.exports = function (options) {
       const displayBounds = screen.getDisplayMatching(state).bounds;
       const sameBounds = deepEqual(state.displayBounds, displayBounds, {strict: true});
       if (!sameBounds) {
-        if (displayBounds.width < state.displayBounds.width) {
-          if (state.x > displayBounds.width) {
-            state.x = 0;
-          }
-
-          if (state.width > displayBounds.width) {
-            state.width = displayBounds.width;
-          }
-        }
-
-        if (displayBounds.height < state.displayBounds.height) {
-          if (state.y > displayBounds.height) {
-            state.y = 0;
-          }
-
-          if (state.height > displayBounds.height) {
-            state.height = displayBounds.height;
-          }
-        }
+        // Reset state to default values on the retrieved display
+        state = {
+          width: config.defaultWidth || 800,
+          height: config.defaultHeight || 600,
+          x: 0,
+          y: 0,
+          displayBounds
+        };
       }
     }
   }
