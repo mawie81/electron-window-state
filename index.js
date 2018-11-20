@@ -33,6 +33,19 @@ module.exports = function (options) {
       Number.isInteger(state.height) && state.height > 0;
   }
 
+  function resetStateToDefault() {
+    const displayBounds = screen.getPrimaryDisplay().bounds;
+
+    // Reset state to default values on the primary display
+    state = {
+      width: config.defaultWidth || 800,
+      height: config.defaultHeight || 600,
+      x: 0,
+      y: 0,
+      displayBounds
+    };
+  }
+
   function validateState() {
     const isValid = state && (hasBounds() || state.isMaximized || state.isFullScreen);
     if (!isValid) {
@@ -45,14 +58,7 @@ module.exports = function (options) {
       const displayBounds = screen.getDisplayMatching(state).bounds;
       const sameBounds = deepEqual(state.displayBounds, displayBounds, {strict: true});
       if (!sameBounds) {
-        // Reset state to default values on the retrieved display
-        state = {
-          width: config.defaultWidth || 800,
-          height: config.defaultHeight || 600,
-          x: 0,
-          y: 0,
-          displayBounds
-        };
+        resetStateToDefault();
       }
     }
   }
@@ -159,6 +165,7 @@ module.exports = function (options) {
     get isFullScreen() { return state.isFullScreen; },
     saveState,
     unmanage,
-    manage
+    manage,
+    resetStateToDefault
   };
 };

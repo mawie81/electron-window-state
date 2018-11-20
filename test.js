@@ -9,7 +9,10 @@ test.before(() => {
   };
   const electronMock = {
     app: {getPath() {return '/temp';}},
-    screen: {getDisplayMatching() {}}
+    screen: {
+      getDisplayMatching() {},
+      getPrimaryDisplay() {}
+    }
   };
   mockery.registerAllowables(['./', 'path', 'object-assign', 'deep-equal', 'sinon', './lib/keys.js', './lib/is_arguments.js']);
   mockery.registerMock('electron', electronMock);
@@ -222,6 +225,7 @@ test('Validate state if saved display is available but window outside display bo
   const {screen} = require('electron');
   const screenBounds = {x: 0, y: 0, width: 1680, height: 1050};
   sinon.stub(screen, 'getDisplayMatching').returns({bounds: screenBounds});
+  sinon.stub(screen, 'getPrimaryDisplay').returns({bounds: screenBounds});
 
   const state = require('.')({
     defaultWidth: 500,
@@ -236,6 +240,7 @@ test('Validate state if saved display is available but window outside display bo
 
   jsonfile.readFileSync.restore();
   screen.getDisplayMatching.restore();
+  screen.getPrimaryDisplay.restore();
 });
 
 test('Ensure window is visible at startup if saved display is unavailable and was on the right', t => {
@@ -251,6 +256,7 @@ test('Ensure window is visible at startup if saved display is unavailable and wa
   const {screen} = require('electron');
   const screenBounds = {x: 0, y: 0, width: 1920, height: 1080};
   sinon.stub(screen, 'getDisplayMatching').returns({bounds: screenBounds});
+  sinon.stub(screen, 'getPrimaryDisplay').returns({bounds: screenBounds});
 
   const state = require('.')({
     defaultWidth: 500,
@@ -264,6 +270,7 @@ test('Ensure window is visible at startup if saved display is unavailable and wa
 
   jsonfile.readFileSync.restore();
   screen.getDisplayMatching.restore();
+  screen.getPrimaryDisplay.restore();
 });
 
 test('Ensure window is visible at startup if saved display is unavailable and was on the left', t => {
@@ -279,6 +286,7 @@ test('Ensure window is visible at startup if saved display is unavailable and wa
   const {screen} = require('electron');
   const screenBounds = {x: 0, y: 0, width: 1920, height: 1080};
   sinon.stub(screen, 'getDisplayMatching').returns({bounds: screenBounds});
+  sinon.stub(screen, 'getPrimaryDisplay').returns({bounds: screenBounds});
 
   const state = require('.')({
     defaultWidth: 500,
@@ -292,6 +300,7 @@ test('Ensure window is visible at startup if saved display is unavailable and wa
 
   jsonfile.readFileSync.restore();
   screen.getDisplayMatching.restore();
+  screen.getPrimaryDisplay.restore();
 });
 
 test('Reset state to default values if saved display is unavailable', t => {
@@ -307,6 +316,7 @@ test('Reset state to default values if saved display is unavailable', t => {
   const {screen} = require('electron');
   const screenBounds = {x: 0, y: 0, width: 1920, height: 1080};
   sinon.stub(screen, 'getDisplayMatching').returns({bounds: screenBounds});
+  sinon.stub(screen, 'getPrimaryDisplay').returns({bounds: screenBounds});
 
   const state = require('.')({
     defaultWidth: 500,
@@ -321,4 +331,5 @@ test('Reset state to default values if saved display is unavailable', t => {
 
   jsonfile.readFileSync.restore();
   screen.getDisplayMatching.restore();
+  screen.getPrimaryDisplay.restore();
 });
