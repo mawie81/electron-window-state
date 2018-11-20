@@ -46,6 +46,27 @@ module.exports = function (options) {
     };
   }
 
+  function windowWithinBounds(state, bounds) {
+    return (
+      state.x >= bounds.x &&
+      state.y >= bounds.y &&
+      state.x + state.width <= bounds.x + bounds.width &&
+      state.y + state.height <= bounds.y + bounds.height
+    );
+  }
+
+  function ensureWindowVisibleOnSomeDisplay() {
+    const visible = screen.getAllDisplays().some(display => {
+      return windowWithinBounds(state, display.bounds);
+    });
+
+    if (!visible) {
+      // Window is partially or fully not visible now.
+      // Reset it to safe defaults.
+      return resetStateToDefault();
+    }
+  }
+
   function validateState() {
     const isValid = state && (hasBounds() || state.isMaximized || state.isFullScreen);
     if (!isValid) {
@@ -57,7 +78,9 @@ module.exports = function (options) {
       // Check if the display where the window was last open is still available
       const displayBounds = screen.getDisplayMatching(state).bounds;
       const sameBounds = deepEqual(state.displayBounds, displayBounds, {strict: true});
-      if (!sameBounds) {
+      if (sameBounds) {
+        ensureWindowVisibleOnSomeDisplay();
+      } else {
         resetStateToDefault();
       }
     }
