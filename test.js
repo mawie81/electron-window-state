@@ -207,6 +207,37 @@ test('Validate state if saved display is available', t => {
   screen.getDisplayMatching.restore();
 });
 
+test('Validate state if saved display is available but window outside display bounds', t => {
+  const jsonfile = require('jsonfile');
+  sinon.stub(jsonfile, 'readFileSync').returns({
+    width: 1000,
+    height: 326,
+    x: 2577,
+    y: 673,
+    isMaximized: false,
+    isFullScreen: false,
+    displayBounds: {x: 0, y: 0, width: 1680, height: 1050}
+  });
+
+  const {screen} = require('electron');
+  const screenBounds = {x: 0, y: 0, width: 1680, height: 1050};
+  sinon.stub(screen, 'getDisplayMatching').returns({bounds: screenBounds});
+
+  const state = require('.')({
+    defaultWidth: 500,
+    defaultHeight: 300
+  });
+
+  t.is(state.x, 0);
+  t.is(state.y, 0);
+  t.is(state.width, 500);
+  t.is(state.height, 300);
+  t.is(state.displayBounds, screenBounds);
+
+  jsonfile.readFileSync.restore();
+  screen.getDisplayMatching.restore();
+});
+
 test('Ensure window is visible at startup if saved display is unavailable and was on the right', t => {
   const jsonfile = require('jsonfile');
   sinon.stub(jsonfile, 'readFileSync').returns({
