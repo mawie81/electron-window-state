@@ -4,7 +4,6 @@ const path = require('path');
 const electron = require('electron');
 const jsonfile = require('jsonfile');
 const mkdirp = require('mkdirp');
-const deepEqual = require('deep-equal');
 
 module.exports = function (options) {
   const app = electron.app || electron.remote.app;
@@ -75,14 +74,7 @@ module.exports = function (options) {
     }
 
     if (hasBounds() && state.displayBounds) {
-      // Check if the display where the window was last open is still available
-      const displayBounds = screen.getDisplayMatching(state).bounds;
-      const sameBounds = deepEqual(state.displayBounds, displayBounds, {strict: true});
-      if (sameBounds) {
-        ensureWindowVisibleOnSomeDisplay();
-      } else {
-        resetStateToDefault();
-      }
+      ensureWindowVisibleOnSomeDisplay();
     }
   }
 
