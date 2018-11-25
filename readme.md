@@ -65,7 +65,7 @@ Note: Don't call this function before the `ready` event is fired.
 
 `file` - *String*
 
-  The name of file. Defaults to `window-state.json`
+  The name of file. Defaults to `window-state.json`. This is usefull if you want to support multiple windows. Simply create multiple ```windowStateKeeper``` instances with different filenames.
 
 `maximize` - *Boolean*
 
