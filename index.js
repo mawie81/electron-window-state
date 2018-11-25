@@ -45,7 +45,7 @@ module.exports = function (options) {
     };
   }
 
-  function windowWithinBounds(state, bounds) {
+  function windowWithinBounds(bounds) {
     return (
       state.x >= bounds.x &&
       state.y >= bounds.y &&
@@ -56,7 +56,7 @@ module.exports = function (options) {
 
   function ensureWindowVisibleOnSomeDisplay() {
     const visible = screen.getAllDisplays().some(display => {
-      return windowWithinBounds(state, display.bounds);
+      return windowWithinBounds(display.bounds);
     });
 
     if (!visible) {
