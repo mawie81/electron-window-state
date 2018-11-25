@@ -4,7 +4,6 @@ const path = require('path');
 const electron = require('electron');
 const jsonfile = require('jsonfile');
 const mkdirp = require('mkdirp');
-const deepEqual = require('deep-equal');
 
 module.exports = function (options) {
   const app = electron.app || electron.remote.app;
@@ -33,6 +32,40 @@ module.exports = function (options) {
       Number.isInteger(state.height) && state.height > 0;
   }
 
+  function resetStateToDefault() {
+    const displayBounds = screen.getPrimaryDisplay().bounds;
+
+    // Reset state to default values on the primary display
+    state = {
+      width: config.defaultWidth || 800,
+      height: config.defaultHeight || 600,
+      x: 0,
+      y: 0,
+      displayBounds
+    };
+  }
+
+  function windowWithinBounds(state, bounds) {
+    return (
+      state.x >= bounds.x &&
+      state.y >= bounds.y &&
+      state.x + state.width <= bounds.x + bounds.width &&
+      state.y + state.height <= bounds.y + bounds.height
+    );
+  }
+
+  function ensureWindowVisibleOnSomeDisplay() {
+    const visible = screen.getAllDisplays().some(display => {
+      return windowWithinBounds(state, display.bounds);
+    });
+
+    if (!visible) {
+      // Window is partially or fully not visible now.
+      // Reset it to safe defaults.
+      return resetStateToDefault();
+    }
+  }
+
   function validateState() {
     const isValid = state && (hasBounds() || state.isMaximized || state.isFullScreen);
     if (!isValid) {
@@ -41,30 +74,7 @@ module.exports = function (options) {
     }
 
     if (hasBounds() && state.displayBounds) {
-      // Check if the display where the window was last open is still available
-      const displayBounds = screen.getDisplayMatching(state).bounds;
-      const sameBounds = deepEqual(state.displayBounds, displayBounds, {strict: true});
-      if (!sameBounds) {
-        if (displayBounds.width < state.displayBounds.width) {
-          if (state.x > displayBounds.width) {
-            state.x = 0;
-          }
-
-          if (state.width > displayBounds.width) {
-            state.width = displayBounds.width;
-          }
-        }
-
-        if (displayBounds.height < state.displayBounds.height) {
-          if (state.y > displayBounds.height) {
-            state.y = 0;
-          }
-
-          if (state.height > displayBounds.height) {
-            state.height = displayBounds.height;
-          }
-        }
-      }
+      ensureWindowVisibleOnSomeDisplay();
     }
   }
 
@@ -165,10 +175,12 @@ module.exports = function (options) {
     get y() { return state.y; },
     get width() { return state.width; },
     get height() { return state.height; },
+    get displayBounds() { return state.displayBounds; },
     get isMaximized() { return state.isMaximized; },
     get isFullScreen() { return state.isFullScreen; },
     saveState,
     unmanage,
-    manage
+    manage,
+    resetStateToDefault
   };
 };

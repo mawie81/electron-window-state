@@ -9,7 +9,11 @@ test.before(() => {
   };
   const electronMock = {
     app: {getPath() {return '/temp';}},
-    screen: {getDisplayMatching() {}}
+    screen: {
+      getDisplayMatching() {},
+      getPrimaryDisplay() {},
+      getAllDisplays() {}
+    }
   };
   mockery.registerAllowables(['./', 'path', 'object-assign', 'deep-equal', 'sinon', './lib/keys.js', './lib/is_arguments.js']);
   mockery.registerMock('electron', electronMock);
@@ -175,4 +179,208 @@ test('saves the state to the file system', t => {
   jsonfile.writeFileSync.restore();
   screen.getDisplayMatching.restore();
   mkdirp.sync.restore();
+});
+
+test('Validate state if saved display is available and primary', t => {
+  const displayBounds = {x: 0, y: 0, width: 1920, height: 1080};
+
+  const jsonfile = require('jsonfile');
+  sinon.stub(jsonfile, 'readFileSync').returns({
+    x: 10,
+    y: 20,
+    width: 800,
+    height: 600,
+    displayBounds
+  });
+
+  const {screen} = require('electron');
+  sinon.stub(screen, 'getDisplayMatching').returns({bounds: displayBounds});
+  sinon.stub(screen, 'getPrimaryDisplay').returns({bounds: displayBounds});
+  sinon.stub(screen, 'getAllDisplays').returns([{bounds: displayBounds}]);
+
+  const state = require('.')({
+    defaultWidth: 500,
+    defaultHeight: 300
+  });
+
+  t.is(state.x, 10);
+  t.is(state.y, 20);
+  t.is(state.width, 800);
+  t.is(state.height, 600);
+  t.is(state.displayBounds, displayBounds);
+
+  jsonfile.readFileSync.restore();
+  screen.getDisplayMatching.restore();
+  screen.getPrimaryDisplay.restore();
+  screen.getAllDisplays.restore();
+});
+
+test('Validate state if saved display is available and secondary on right', t => {
+  const primaryDisplayBounds = {x: 0, y: 0, width: 1920, height: 1080};
+  const secondaryDisplayBounds = {x: 1920, y: 0, width: 2560, height: 1440};
+
+  const jsonfile = require('jsonfile');
+  sinon.stub(jsonfile, 'readFileSync').returns({
+    x: 2000,
+    y: 1100,
+    width: 800,
+    height: 300,
+    displayBounds: secondaryDisplayBounds
+  });
+
+  const {screen} = require('electron');
+  sinon.stub(screen, 'getDisplayMatching').returns({bounds: secondaryDisplayBounds});
+  sinon.stub(screen, 'getPrimaryDisplay').returns({bounds: primaryDisplayBounds});
+  sinon.stub(screen, 'getAllDisplays').returns([
+    {bounds: primaryDisplayBounds},
+    {bounds: secondaryDisplayBounds}
+  ]);
+
+  const state = require('.')({
+    defaultWidth: 500,
+    defaultHeight: 300
+  });
+
+  t.is(state.x, 2000);
+  t.is(state.y, 1100);
+  t.is(state.width, 800);
+  t.is(state.height, 300);
+  t.is(state.displayBounds, secondaryDisplayBounds);
+
+  jsonfile.readFileSync.restore();
+  screen.getDisplayMatching.restore();
+  screen.getPrimaryDisplay.restore();
+  screen.getAllDisplays.restore();
+});
+
+test('Validate state if saved display is available but window outside display bounds', t => {
+  const jsonfile = require('jsonfile');
+  sinon.stub(jsonfile, 'readFileSync').returns({
+    width: 1000,
+    height: 326,
+    x: 2577,
+    y: 673,
+    isMaximized: false,
+    isFullScreen: false,
+    displayBounds: {x: 0, y: 0, width: 1680, height: 1050}
+  });
+
+  const {screen} = require('electron');
+  const screenBounds = {x: 0, y: 0, width: 1680, height: 1050};
+  sinon.stub(screen, 'getDisplayMatching').returns({bounds: screenBounds});
+  sinon.stub(screen, 'getPrimaryDisplay').returns({bounds: screenBounds});
+  sinon.stub(screen, 'getAllDisplays').returns([{bounds: screenBounds}]);
+
+  const state = require('.')({
+    defaultWidth: 500,
+    defaultHeight: 300
+  });
+
+  t.is(state.x, 0);
+  t.is(state.y, 0);
+  t.is(state.width, 500);
+  t.is(state.height, 300);
+  t.is(state.displayBounds, screenBounds);
+
+  jsonfile.readFileSync.restore();
+  screen.getDisplayMatching.restore();
+  screen.getPrimaryDisplay.restore();
+  screen.getAllDisplays.restore();
+});
+
+test('Ensure window is visible at startup if saved display is unavailable and was on the right', t => {
+  const jsonfile = require('jsonfile');
+  sinon.stub(jsonfile, 'readFileSync').returns({
+    x: 2000,
+    y: 0,
+    width: 2550,
+    height: 1430,
+    displayBounds: {x: 1920, y: 0, width: 2560, height: 1440}
+  });
+
+  const {screen} = require('electron');
+  const screenBounds = {x: 0, y: 0, width: 1920, height: 1080};
+  sinon.stub(screen, 'getDisplayMatching').returns({bounds: screenBounds});
+  sinon.stub(screen, 'getPrimaryDisplay').returns({bounds: screenBounds});
+  sinon.stub(screen, 'getAllDisplays').returns([{bounds: screenBounds}]);
+
+  const state = require('.')({
+    defaultWidth: 500,
+    defaultHeight: 300
+  });
+
+  t.is(state.x, 0);
+  t.is(state.y, 0);
+  t.is(state.width, 500);
+  t.is(state.height, 300);
+
+  jsonfile.readFileSync.restore();
+  screen.getDisplayMatching.restore();
+  screen.getPrimaryDisplay.restore();
+  screen.getAllDisplays.restore();
+});
+
+test('Ensure window is visible at startup if saved display is unavailable and was on the left', t => {
+  const jsonfile = require('jsonfile');
+  sinon.stub(jsonfile, 'readFileSync').returns({
+    x: -2000,
+    y: 0,
+    width: 2550,
+    height: 1430,
+    displayBounds: {x: -2560, y: 0, width: 2560, height: 1440}
+  });
+
+  const {screen} = require('electron');
+  const screenBounds = {x: 0, y: 0, width: 1920, height: 1080};
+  sinon.stub(screen, 'getDisplayMatching').returns({bounds: screenBounds});
+  sinon.stub(screen, 'getPrimaryDisplay').returns({bounds: screenBounds});
+  sinon.stub(screen, 'getAllDisplays').returns([{bounds: screenBounds}]);
+
+  const state = require('.')({
+    defaultWidth: 500,
+    defaultHeight: 300
+  });
+
+  t.is(state.x, 0);
+  t.is(state.y, 0);
+  t.is(state.width, 500);
+  t.is(state.height, 300);
+
+  jsonfile.readFileSync.restore();
+  screen.getDisplayMatching.restore();
+  screen.getPrimaryDisplay.restore();
+  screen.getAllDisplays.restore();
+});
+
+test('Reset state to default values if saved display is unavailable', t => {
+  const jsonfile = require('jsonfile');
+  sinon.stub(jsonfile, 'readFileSync').returns({
+    x: -2000,
+    y: -1000,
+    width: 800,
+    height: 600,
+    displayBounds: {x: -2560, y: -480, width: 2560, height: 1440}
+  });
+
+  const {screen} = require('electron');
+  const screenBounds = {x: 0, y: 0, width: 1920, height: 1080};
+  sinon.stub(screen, 'getDisplayMatching').returns({bounds: screenBounds});
+  sinon.stub(screen, 'getPrimaryDisplay').returns({bounds: screenBounds});
+  sinon.stub(screen, 'getAllDisplays').returns([{bounds: screenBounds}]);
+
+  const state = require('.')({
+    defaultWidth: 500,
+    defaultHeight: 300
+  });
+
+  t.is(state.x, 0);
+  t.is(state.y, 0);
+  t.is(state.width, 500);
+  t.is(state.height, 300);
+  t.is(state.displayBounds, screenBounds);
+
+  jsonfile.readFileSync.restore();
+  screen.getDisplayMatching.restore();
+  screen.getPrimaryDisplay.restore();
+  screen.getAllDisplays.restore();
 });
