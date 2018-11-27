@@ -253,6 +253,44 @@ test('Validate state if saved display is available and secondary on right', t =>
   screen.getAllDisplays.restore();
 });
 
+test('Validate state if saved display is available and secondary on left', t => {
+  const primaryDisplayBounds = {x: 0, y: 0, width: 1920, height: 1080};
+  const secondaryDisplayBounds = {x: -2560, y: -480, width: 2560, height: 1440};
+
+  const jsonfile = require('jsonfile');
+  sinon.stub(jsonfile, 'readFileSync').returns({
+    x: -2000,
+    y: -1000,
+    width: 800,
+    height: 600,
+    displayBounds: secondaryDisplayBounds
+  });
+
+  const {screen} = require('electron');
+  sinon.stub(screen, 'getDisplayMatching').returns({bounds: secondaryDisplayBounds});
+  sinon.stub(screen, 'getPrimaryDisplay').returns({bounds: primaryDisplayBounds});
+  sinon.stub(screen, 'getAllDisplays').returns([
+    {bounds: primaryDisplayBounds},
+    {bounds: secondaryDisplayBounds}
+  ]);
+
+  const state = require('.')({
+    defaultWidth: 500,
+    defaultHeight: 300
+  });
+
+  t.is(state.x, -2000);
+  t.is(state.y, -1000);
+  t.is(state.width, 800);
+  t.is(state.height, 600);
+  t.is(state.displayBounds, secondaryDisplayBounds);
+
+  jsonfile.readFileSync.restore();
+  screen.getDisplayMatching.restore();
+  screen.getPrimaryDisplay.restore();
+  screen.getAllDisplays.restore();
+});
+
 test('Validate state if saved display is available but window outside display bounds', t => {
   const jsonfile = require('jsonfile');
   sinon.stub(jsonfile, 'readFileSync').returns({
