@@ -16,7 +16,8 @@ module.exports = function (options) {
     file: 'window-state.json',
     path: app.getPath('userData'),
     maximize: true,
-    fullScreen: true
+    fullScreen: true,
+    resetToCenter: false
   }, options);
   const fullStoreFileName = path.join(config.path, config.file);
 
@@ -33,18 +34,22 @@ module.exports = function (options) {
   }
 
   function resetStateToDefault() {
-    let width;
-    let height;
+    let x = 0;
+    let y = 0;
+    const width = config.defaultWidth || 800;
+    const height = config.defaultHeight || 600;
     const displayBounds = screen.getPrimaryDisplay().bounds;
 
     // Reset state to default values on the primary display
-    width = config.defaultWidth || 800;
-    height = config.defaultHeight || 600;
+    if (config.resetToCenter) {
+      x = (displayBounds.width - width) / 2;
+      y = (displayBounds.height - height) / 2;
+    }
     state = {
-      width: width,
-      height: height,
-      x: (displayBounds.width - width)/2,
-      y: (displayBounds.height - height)/2,
+      width,
+      height,
+      x,
+      y,
       displayBounds
     };
   }
