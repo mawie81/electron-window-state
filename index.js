@@ -33,11 +33,13 @@ module.exports = function (options) {
   }
 
   function resetStateToDefault() {
+    let width;
+    let height;
     const displayBounds = screen.getPrimaryDisplay().bounds;
 
     // Reset state to default values on the primary display
-    width = config.defaultWidth || 800
-    height = config.defaultHeight || 600
+    width = config.defaultWidth || 800;
+    height = config.defaultHeight || 600;
     state = {
       width: width,
       height: height,
