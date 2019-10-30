@@ -178,7 +178,7 @@ module.exports = function (options) {
   state = Object.assign(
     {
       width: config.defaultWidth || 800,
-      height: config.defaultHeight || 600
+      height: config.defaultHeight || 600,
     },
     state
   );
@@ -207,6 +207,9 @@ module.exports = function (options) {
     },
     set custom(custom) {
       state.custom = custom;
+    },
+    get custom() {
+      return state.custom;
     },
     saveState,
     unmanage,
