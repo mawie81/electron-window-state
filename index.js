@@ -17,8 +17,7 @@ module.exports = function (options) {
       file: 'window-state.json',
       path: app.getPath('userData'),
       maximize: true,
-      fullScreen: true,
-      custom: {}
+      fullScreen: true
     },
     options
   );
@@ -205,11 +204,11 @@ module.exports = function (options) {
     get isFullScreen() {
       return state.isFullScreen;
     },
-    set custom(custom) {
-      state.custom = custom;
-    },
-    get custom() {
+    getCustom() {
       return state.custom;
+    },
+    setCustom(custom) {
+      state.custom = custom;
     },
     saveState,
     unmanage,
