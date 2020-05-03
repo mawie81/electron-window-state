@@ -40,6 +40,8 @@ declare namespace windowStateKeeper {
         x: number;
         /** The saved y coordinate of the loaded state. `undefined` if the state has not been saved yet. */
         y: number;
+        /** The saved custom properties of the loaded state */
+        custom: { [key: string]: any };
     }
 }
 

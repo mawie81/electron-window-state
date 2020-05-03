@@ -2,6 +2,8 @@ import test from 'ava';
 import mockery from 'mockery';
 import sinon from 'sinon';
 
+const isWin = require('process').platform === 'win32';
+
 test.before(() => {
   const jsonfileMock = {
     writeFileSync() {},
@@ -39,7 +41,7 @@ test('tries to read state file from the default location', t => {
   require('.')({defaultWidth: 1000, defaultHeight: 2000});
 
   t.true(jsonfile.readFileSync.calledOnce);
-  t.true(jsonfile.readFileSync.calledWith('/temp/window-state.json'));
+  t.true(jsonfile.readFileSync.calledWith(isWin ? '\\temp\\window-state.json' : '/temp/window-state.json'));
   jsonfile.readFileSync.restore();
 });
 
@@ -50,7 +52,7 @@ test('tries to read state file from the configured source', t => {
   require('.')({defaultWidth: 1000, defaultHeight: 2000, path: '/data', file: 'state.json'});
 
   t.true(jsonfile.readFileSync.calledOnce);
-  t.true(jsonfile.readFileSync.calledWith('/data/state.json'));
+  t.true(jsonfile.readFileSync.calledWith(isWin ? '\\data\\state.json' : '/data/state.json'));
   jsonfile.readFileSync.restore();
 });
 
@@ -166,7 +168,7 @@ test('saves the state to the file system', t => {
   state.saveState(win);
 
   t.truthy(mkdirp.sync.calledOnce);
-  t.truthy(jsonfile.writeFileSync.calledWith('/temp/window-state.json', {
+  t.truthy(jsonfile.writeFileSync.calledWith(isWin ? '\\temp\\window-state.json' : '/temp/window-state.json', {
     x: 100,
     y: 100,
     width: 500,

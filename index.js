@@ -177,7 +177,7 @@ module.exports = function (options) {
   state = Object.assign(
     {
       width: config.defaultWidth || 800,
-      height: config.defaultHeight || 600,
+      height: config.defaultHeight || 600
     },
     state
   );
@@ -204,10 +204,10 @@ module.exports = function (options) {
     get isFullScreen() {
       return state.isFullScreen;
     },
-    getCustom() {
+    get custom() {
       return state.custom;
     },
-    setCustom(custom) {
+    set custom(custom) {
       state.custom = custom;
     },
     saveState,
