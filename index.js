@@ -16,7 +16,9 @@ module.exports = function (options) {
     file: 'window-state.json',
     path: app.getPath('userData'),
     maximize: true,
-    fullScreen: true
+    fullScreen: true,
+    allowPartiallyVisibleWindow: false,
+    minVisiblePart: 100
   }, options);
   const fullStoreFileName = path.join(config.path, config.file);
 
@@ -45,6 +47,15 @@ module.exports = function (options) {
     };
   }
 
+  function isPartiallyVisibleWindow(bounds) {
+    return (
+      bounds.x + config.minVisiblePart < state.x + state.width &&
+      bounds.x + bounds.width - config.minVisiblePart > state.x &&
+      bounds.y + config.minVisiblePart < state.y + state.height &&
+      bounds.y + bounds.height - config.minVisiblePart > state.y
+    );
+  }
+
   function windowWithinBounds(bounds) {
     return (
       state.x >= bounds.x &&
@@ -56,7 +67,13 @@ module.exports = function (options) {
 
   function ensureWindowVisibleOnSomeDisplay() {
     const visible = screen.getAllDisplays().some(display => {
-      return windowWithinBounds(display.bounds);
+      return (
+        windowWithinBounds(display.bounds) ||
+        (
+          config.allowPartiallyVisibleWindow &&
+          isPartiallyVisibleWindow(display.bounds)
+        )
+      );
     });
 
     if (!visible) {
