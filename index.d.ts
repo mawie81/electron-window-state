@@ -1,4 +1,4 @@
-import * as Electron from 'electron'
+import * as Electron from 'electron';
 
 declare function windowStateKeeper(opts: windowStateKeeper.Options): windowStateKeeper.State;
 
@@ -15,12 +15,16 @@ declare namespace windowStateKeeper {
         file?: string;
         /** Should we automatically maximize the window, if it was last closed maximized. Defaults to `true`. */
         maximize?: boolean;
+        /** The X position that should be returned if no file exists yet. Defaults to `0`. */
+        defaultX?: number | undefined;
+        /** The Y position that should be returned if no file exists yet. Defaults to `0`. */
+        defaultY?: number | undefined;
     }
 
     interface State {
         displayBounds: {
-          height: number;
-          width: number;
+            height: number;
+            width: number;
         };
         /** The saved height of loaded state. `defaultHeight` if the state has not been saved yet. */
         height: number;

@@ -16,7 +16,9 @@ module.exports = function (options) {
     file: 'window-state.json',
     path: app.getPath('userData'),
     maximize: true,
-    fullScreen: true
+    fullScreen: true,
+    defaultX: 0,
+    defaultY: 0
   }, options);
   const fullStoreFileName = path.join(config.path, config.file);
 
@@ -39,8 +41,8 @@ module.exports = function (options) {
     state = {
       width: config.defaultWidth || 800,
       height: config.defaultHeight || 600,
-      x: 0,
-      y: 0,
+      x: 'defaultX' in config ? config.defaultX : 0,
+      y: 'defaultY' in config ? config.defaultY : 0,
       displayBounds
     };
   }
@@ -167,7 +169,9 @@ module.exports = function (options) {
   // Set state fallback values
   state = Object.assign({
     width: config.defaultWidth || 800,
-    height: config.defaultHeight || 600
+    height: config.defaultHeight || 600,
+    x: 'defaultX' in config ? config.defaultX : 0,
+    y: 'defaultY' in config ? config.defaultY : 0
   }, state);
 
   return {

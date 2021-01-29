@@ -58,6 +58,14 @@ Note: Don't call this function before the `ready` event is fired.
 
   The height that should be returned if no file exists yet. Defaults to `600`.
 
+`defaultX` - Number | Undefined
+
+  The X position that should be returned if no file exists yet. Defaults to `0`.
+
+`defaultY` - Number | Undefined
+
+  The Y position that should be returned if no file exists yet. Defaults to `0`.
+
 `path` - *String*
 
   The path where the state file should be written to. Defaults to
