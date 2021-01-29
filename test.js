@@ -384,3 +384,16 @@ test('Reset state to default values if saved display is unavailable', t => {
   screen.getPrimaryDisplay.restore();
   screen.getAllDisplays.restore();
 });
+
+test('Set defaultX and defaultY if no state exists', t => {
+  let state = require('.')({defaultX: 100, defaultY: 200});
+
+  t.is(state.x, 100);
+  t.is(state.y, 200);
+
+  state = require('.')({defaultX: undefined, defaultY: undefined});
+
+  t.is(state.x, undefined);
+  t.is(state.y, undefined);
+});
+
