@@ -45,21 +45,45 @@ module.exports = function (options) {
     };
   }
 
-  function windowWithinBounds(bounds) {
+  function newPoint(x, y) {
+    return {
+      x,
+      y,
+    };
+  }
+
+  function pointWithinBounds(point, bounds) {
     return (
-      state.x >= bounds.x &&
-      state.y >= bounds.y &&
-      state.x + state.width <= bounds.x + bounds.width &&
-      state.y + state.height <= bounds.y + bounds.height
-    );
+      point.x >= bounds.x &&
+      point.y >= bounds.y &&
+      point.x <= bounds.x + bounds.width &&
+      point.y <= bounds.y + bounds.height
+    )
   }
 
   function ensureWindowVisibleOnSomeDisplay() {
-    const visible = screen.getAllDisplays().some(display => {
-      return windowWithinBounds(display.bounds);
-    });
-
-    if (!visible) {
+    const points = [];
+    points.push(newPoint(state.x, state.y));
+    points.push(newPoint(state.x, state.y + state.height));
+    points.push(newPoint(state.x + state.width, state.y));
+    points.push(newPoint(state.x + state.width, state.y + state.height));
+    const displays = screen.getAllDisplays();
+    const length = displays.length;
+    let valid_point_count = 0;
+    for (let i = 0; i < length; i++) {
+      const curr_display = displays[i];
+      const point_length = points.length;
+      for (let j = 0; j < point_length; j++) {
+        if (pointWithinBounds(points[j], curr_display.bounds)) {
+          valid_point_count++;
+        }
+      }
+      if (valid_point_count === 4) {
+        break;
+      }
+    }
+        
+    if (valid_point_count !== 4) {
       // Window is partially or fully not visible now.
       // Reset it to safe defaults.
       return resetStateToDefault();
