@@ -16,7 +16,8 @@ module.exports = function (options) {
     file: 'window-state.json',
     path: app.getPath('userData'),
     maximize: true,
-    fullScreen: true
+    fullScreen: true,
+    outOfBounds: false
   }, options);
   const fullStoreFileName = path.join(config.path, config.file);
 
@@ -45,21 +46,49 @@ module.exports = function (options) {
     };
   }
 
-  function windowWithinBounds(bounds) {
+  function newPoint(x, y) {
+    return {
+      x,
+      y,
+    };
+  }
+
+  function pointWithinBounds(point, bounds) {
     return (
-      state.x >= bounds.x &&
-      state.y >= bounds.y &&
-      state.x + state.width <= bounds.x + bounds.width &&
-      state.y + state.height <= bounds.y + bounds.height
-    );
+      point.x >= bounds.x &&
+      point.y >= bounds.y &&
+      point.x <= bounds.x + bounds.width &&
+      point.y <= bounds.y + bounds.height
+    )
   }
 
   function ensureWindowVisibleOnSomeDisplay() {
-    const visible = screen.getAllDisplays().some(display => {
-      return windowWithinBounds(display.bounds);
-    });
-
-    if (!visible) {
+    const points = [];
+    points.push(newPoint(state.x, state.y));
+    points.push(newPoint(state.x, state.y + state.height));
+    points.push(newPoint(state.x + state.width, state.y));
+    points.push(newPoint(state.x + state.width, state.y + state.height));
+    const displays = screen.getAllDisplays();
+    const displayLength = displays.length;
+    let currentPointCount = 0;
+    let validPointCount = 4;
+    if (config.outOfBounds) {
+      validPointCount = 1;
+    }
+    for (let i = 0; i < displayLength; i++) {
+      const currDisplay = displays[i];
+      const pointLength = points.length;
+      for (let j = 0; j < pointLength; j++) {
+        if (pointWithinBounds(points[j], currDisplay.bounds)) {
+          currentPointCount++;
+        }
+      }
+      if (currentPointCount >= validPointCount) {
+        break;
+      }
+    }
+        
+    if (currentPointCount < validPointCount) {
       // Window is partially or fully not visible now.
       // Reset it to safe defaults.
       return resetStateToDefault();
