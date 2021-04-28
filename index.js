@@ -16,7 +16,8 @@ module.exports = function (options) {
     file: 'window-state.json',
     path: app.getPath('userData'),
     maximize: true,
-    fullScreen: true
+    fullScreen: true,
+    outOfBounds: false
   }, options);
   const fullStoreFileName = path.join(config.path, config.file);
 
@@ -68,22 +69,26 @@ module.exports = function (options) {
     points.push(newPoint(state.x + state.width, state.y));
     points.push(newPoint(state.x + state.width, state.y + state.height));
     const displays = screen.getAllDisplays();
-    const length = displays.length;
-    let valid_point_count = 0;
-    for (let i = 0; i < length; i++) {
-      const curr_display = displays[i];
-      const point_length = points.length;
-      for (let j = 0; j < point_length; j++) {
-        if (pointWithinBounds(points[j], curr_display.bounds)) {
-          valid_point_count++;
+    const displayLength = displays.length;
+    let currentPointCount = 0;
+    let validPointCount = 4;
+    if (config.outOfBounds) {
+      validPointCount = 1;
+    }
+    for (let i = 0; i < displayLength; i++) {
+      const currDisplay = displays[i];
+      const pointLength = points.length;
+      for (let j = 0; j < pointLength; j++) {
+        if (pointWithinBounds(points[j], currDisplay.bounds)) {
+          currentPointCount++;
         }
       }
-      if (valid_point_count === 4) {
+      if (currentPointCount >= validPointCount) {
         break;
       }
     }
         
-    if (valid_point_count !== 4) {
+    if (currentPointCount < validPointCount) {
       // Window is partially or fully not visible now.
       // Reset it to safe defaults.
       return resetStateToDefault();
