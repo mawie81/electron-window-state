@@ -15,6 +15,8 @@ declare namespace windowStateKeeper {
         file?: string;
         /** Should we automatically maximize the window, if it was last closed maximized. Defaults to `true`. */
         maximize?: boolean;
+        /** Allow the window to go out of bounds as long as one corner is still in view. */
+        outOfBounds?: boolean;
     }
 
     interface State {
