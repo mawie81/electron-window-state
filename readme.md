@@ -26,6 +26,7 @@ app.on('ready', function () {
 
   // Create the window using the state information
   win = new BrowserWindow({
+    'backgroundColor': mainWindowState.backgroundColor,
     'x': mainWindowState.x,
     'y': mainWindowState.y,
     'width': mainWindowState.width,
@@ -49,6 +50,10 @@ because it changes how to calculate window size.
 Note: Don't call this function before the `ready` event is fired.
 
 ##### opts
+
+`backgroundColor` - *String*
+
+  The default background color if no file exists yet. Defaults to `#fff`.
 
 `defaultWidth` - *Number*
 
@@ -85,6 +90,11 @@ const windowState = windowStateKeeper({
   defaultHeight: 800
 });
 ```
+
+`backgroundColor` - *string*
+
+  The saved background color of the `BrowserWindow`. `undefined` if the state has
+  not been saved yet.
 
 `x` - *Number*
 
@@ -133,6 +143,13 @@ const windowState = windowStateKeeper({
 
   Saves the current state of the given `BrowserWindow`. This exists mostly for
   legacy purposes, and in most cases it's better to just use `manage`.
+
+## Testing changes
+
+```bash
+$ npm install
+$ npm test
+```
 
 ## License
 

@@ -37,11 +37,12 @@ module.exports = function (options) {
 
     // Reset state to default values on the primary display
     state = {
-      width: config.defaultWidth || 800,
+      backgroundColor: '#fff',
+      displayBounds,
       height: config.defaultHeight || 600,
+      width: config.defaultWidth || 800,
       x: 0,
-      y: 0,
-      displayBounds
+      y: 0
     };
   }
 
@@ -85,16 +86,17 @@ module.exports = function (options) {
     }
     // Don't throw an error when window was closed
     try {
+      state.backgroundColor = win.getBackgroundColor();
       const winBounds = win.getBounds();
+      state.displayBounds = screen.getDisplayMatching(winBounds).bounds;
       if (isNormal(win)) {
+        state.height = winBounds.height;
+        state.width = winBounds.width;
         state.x = winBounds.x;
         state.y = winBounds.y;
-        state.width = winBounds.width;
-        state.height = winBounds.height;
       }
-      state.isMaximized = win.isMaximized();
       state.isFullScreen = win.isFullScreen();
-      state.displayBounds = screen.getDisplayMatching(winBounds).bounds;
+      state.isMaximized = win.isMaximized();
     } catch (err) {}
   }
 
@@ -171,13 +173,14 @@ module.exports = function (options) {
   }, state);
 
   return {
+    get backgroundColor() { return state.backgroundColor; },
+    get displayBounds() { return state.displayBounds; },
+    get height() { return state.height; },
+    get isFullScreen() { return state.isFullScreen; },
+    get isMaximized() { return state.isMaximized; },
+    get width() { return state.width; },
     get x() { return state.x; },
     get y() { return state.y; },
-    get width() { return state.width; },
-    get height() { return state.height; },
-    get displayBounds() { return state.displayBounds; },
-    get isMaximized() { return state.isMaximized; },
-    get isFullScreen() { return state.isFullScreen; },
     saveState,
     unmanage,
     manage,
