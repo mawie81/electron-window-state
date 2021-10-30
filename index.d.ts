@@ -15,9 +15,14 @@ declare namespace windowStateKeeper {
         file?: string;
         /** Should we automatically maximize the window, if it was last closed maximized. Defaults to `true`. */
         maximize?: boolean;
+        /** The default background color, if one is not available. Defaults to `#fff` */
+        defaultBackgroundColor?: string;
     }
 
     interface State {
+        /** The saved background color of the loaded state. `#fff` if the state has not been saved yet. */
+        backgroundColor: string;
+        /** Display bounds. Used for matching which display the window is on. */
         displayBounds: {
           height: number;
           width: number;

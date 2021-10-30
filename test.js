@@ -140,6 +140,7 @@ test('maximize and set the window fullscreen if enabled', t => {
 
 test('saves the state to the file system', t => {
   const win = {
+    backgroundColor: sinon.stub().returns('#990066'),
     getBounds: sinon.stub().returns({
       x: 100,
       y: 100,
@@ -167,6 +168,7 @@ test('saves the state to the file system', t => {
 
   t.truthy(mkdirp.sync.calledOnce);
   t.truthy(jsonfile.writeFileSync.calledWith('/temp/window-state.json', {
+    backgroundColor: '#990066',
     x: 100,
     y: 100,
     width: 500,
