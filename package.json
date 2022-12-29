@@ -24,7 +24,7 @@
     "mkdirp": "^0.5.1"
   },
   "devDependencies": {
-    "ava": "^0.25.0",
+    "ava": "^5.1.0",
     "mockery": "^2.1.0",
     "sinon": "^6.1.5",
     "xo": "^0.22.0"
